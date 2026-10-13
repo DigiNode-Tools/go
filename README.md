@@ -11,6 +11,8 @@ Edit [`links.json`](links.json): `"name": "https://where-it-goes"`. A name is a 
 
 Don't remove a link that DigiNode Tools has used - older versions may still print it. Point it somewhere useful instead.
 
+Clicks are counted with [GoatCounter](https://www.goatcounter.com) (no cookies, no personal data), for each link. A tag on a link says where it was shown, e.g. `https://go.diginode.tools/telegram?dnt` is counted as a click in DigiNode Tools (`dnt`, `bsky`, `tg` and `x` have names; any other tag is counted as itself).
+
 ## How it's built
 
 [`build.py`](build.py) makes a redirect page for each link, run by a [GitHub Action](.github/workflows/build.yml) whenever `links.json` changes and every hour. A DigiFact short link that's newer than the last build is sent to its page on the DigiFacts website by the "not found" page.

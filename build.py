@@ -20,6 +20,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -29,17 +30,32 @@ DIGIFACTS_LINKS = "https://digifacts.diginode.tools/short-links.json"
 DIGIFACT_CODE_RE = re.compile(r"[bcdfghjkmnpqrstvwxz2-9]{4}")
 NAME_RE = re.compile(r"[a-z0-9]+(-[a-z0-9]+)*")
 RESERVED = {"index", "404", "cname"}
+# Clicks on named links are counted with GoatCounter (no cookies, no personal data) - DigiNode Tools' own account,
+# separate from DigiFacts'. A tag on a link says where it was shown (e.g. ?dnt = DigiNode Tools); without one, the
+# website it was on is counted.
+STATS_URL = "https://diginode.goatcounter.com"
+SOURCE_TAGS = {"dnt": "DigiNode Tools", "bsky": "Bluesky", "tg": "Telegram", "x": "X"}
 
 
 def fail(msg):
     sys.exit(f"ERROR: {msg}")
 
 
-def redirect_page(name, url):
+def redirect_page(name, url, count=True):
+    """A named link's page: counts the click (if the counter isn't blocked), then goes to its address."""
     u = html.escape(url, quote=True)
+    script = f"location.replace({json.dumps(url)})"
+    if count:
+        c = STATS_URL + "/count?" + urllib.parse.urlencode({"p": "/" + name, "t": name, "r": ""})
+        script = (f"try{{var c={json.dumps(c)},v=(location.search.match(/^\\?([a-z0-9-]{{1,20}})/i)||[])[1],"
+                  f"n={json.dumps(SOURCE_TAGS)};"
+                  "if(v)c=c.replace('&r=','&r='+encodeURIComponent(n[v.toLowerCase()]||v));"
+                  "else if(document.referrer)c=c.replace('&r=','&r='+encodeURIComponent(document.referrer));"
+                  "c+='&rnd='+Math.random().toString(36).slice(2);"
+                  "if(navigator.sendBeacon)navigator.sendBeacon(c);else(new Image()).src=c}catch(e){}" + script)
     return ('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>DigiNode Tools link</title>'
             f'<meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url={u}">'
-            f'<script>location.replace({json.dumps(url)})</script></head>'
+            f'<script>{script}</script></head>'
             f'<body><p>Going to <a href="{u}">{u}</a></p></body></html>\n')
 
 
@@ -95,7 +111,7 @@ def main():
         files[f"{code}.html"] = link["page"]
         files[f"{code.upper()}.html"] = link["qr_page"]
 
-    files["index.html"] = redirect_page("index", "https://diginode.tools/")
+    files["index.html"] = redirect_page("index", "https://diginode.tools/", count=False)
     files["404.html"] = NOT_FOUND
     files[".nojekyll"] = ""
 
