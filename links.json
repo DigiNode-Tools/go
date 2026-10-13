@@ -1,0 +1,4 @@
+{
+  "_comment": "Short links on go.diginode.tools: \"name\": \"https://where-it-goes\". Names are lower case words (letters, numbers and hyphens), and must contain a vowel - so they can never clash with a DigiFact's four-character short link (e.g. 7ttm), which never has one. Change where a link goes at any time: every DigiNode that uses it follows straight away.",
+  "digifacts": "https://digifacts.diginode.tools/"
+}

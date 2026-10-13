@@ -1,0 +1,43 @@
+# Builds go.diginode.tools (see build.py) and publishes it on GitHub Pages: whenever the links change, and every
+# hour (ten minutes after the DigiFacts build) to pick up new DigiFacts' short links.
+name: Build and publish
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "33 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: write   # Keep the hourly schedule enabled (see the last step)
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: python3 build.py _site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+      # GitHub turns off schedules in repos with no commits for 60 days. This keeps it on.
+      - name: Keep the schedule enabled
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/build.yml/enable" || true
