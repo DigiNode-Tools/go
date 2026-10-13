@@ -51,7 +51,7 @@ NOT_FOUND = """<!doctype html><html lang="en"><head><meta charset="utf-8"><title
 (function () {
   var code = location.pathname.replace(/^\\/+|\\/+$/g, "").replace(/\\.html$/, "").toLowerCase();
   if (/^[bcdfghjkmnpqrstvwxz2-9]{4}$/.test(code)) {
-    location.replace("https://digifacts.diginode.tools/l/" + code + ".html");
+    location.replace("https://digifacts.diginode.tools/l/" + code + ".html" + location.search);   // Keeps a ?tag
   }
 })();
 </script>
