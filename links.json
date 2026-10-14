@@ -8,5 +8,6 @@
   "conf-template": "https://jlopp.github.io/bitcoin-core-config-generator/",
   "opennodes": "https://opennodes.digibyte.link/",
   "kofi": "https://ko-fi.com/diginode",
+  "github-sponsors": "https://github.com/sponsors/DigiNode-Tools",
   "featured-sponsor": "https://github.com/DigiNode-Tools/diginode-sponsors/issues/new?template=featured-sponsor.yml"
 }
